@@ -46,6 +46,7 @@ class MyApp extends StatelessWidget {
         accentColor: SystemTheme.accentColor.accent.toAccentColor(),
         brightness: Brightness.dark,
       ),
+      themeMode: ThemeMode.system,
       home: MyHomePage(title: 'RPC-Tool'),
     );
   }
@@ -70,11 +71,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late String clientID;
-  late String details;
-  late String state;
+  String clientID = "";
+  String details = "";
+  String state = "";
   String startTime = "";
   String endTime = "";
+  String imageKey = "";
+  String imageText = "";
+  String smallImageKey = "";
+  String smallImageText = "";
 
   bool started = false;
 
@@ -93,6 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
         details: details,
         startTimeStamp: start,
         endTimeStamp: end,
+        largeImageKey: imageKey,
+        largeImageText: imageText,
       ),
     );
 
@@ -112,104 +119,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldPage(
-      content: Padding(
-        padding: EdgeInsets.only(bottom: 40),
-        child: ListView(
-          children: <Widget>[
-            InfoLabel(
-              label: 'Enter client ID:',
-              child: TextBox(
-                placeholder: 'Client ID',
-                expands: false,
-                onChanged: (str) {
-                  clientID = str;
-                },
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Text',
-                  style: FluentTheme.of(context).typography.subtitle,
-                ),
-                InfoLabel(
-                  label: 'Top text:',
-                  child: TextBox(
-                    placeholder: 'Details',
-                    expands: false,
-                    onChanged: (str) {
-                      details = str;
-                    },
-                  ),
-                ),
-                InfoLabel(
-                  label: 'Bottom text:',
-                  child: TextBox(
-                    placeholder: 'State',
-                    expands: false,
-                    onChanged: (str) {
-                      state = str;
-                    },
-                  ),
-                ),
-              ]
-              .map((w) => Padding(
-                padding: EdgeInsets.only(top: 5, bottom: 5),
-                child: w,
-              )).toList(),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Timestamp',
-                  style: FluentTheme.of(context).typography.subtitle,
-                ),
-                InfoLabel(
-                  label: 'Start:',
-                  child: TextBox(
-                    placeholder: 'Start timestamp in ms',
-                    expands: false,
-                    onChanged: (str) {
-                      startTime = str;
-                    },
-                  ),
-                ),
-                InfoLabel(
-                  label: 'End:',
-                  child: TextBox(
-                    placeholder: 'End timestamp in ms',
-                    expands: false,
-                    onChanged: (str) {
-                      endTime = str;
-                    },
-                  ),
-                ),
-              ]
-              .map((w) => Padding(
-                padding: EdgeInsets.only(top: 5, bottom: 5),
-                child: w,
-              )).toList(),
-            )
-          ]
-          .map((w) => Padding(
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 48),
-            child: w,
-          )).toList(),
-        ),
-      ),
+    return ScaffoldPage.scrollable(
       bottomBar: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
-          padding: EdgeInsets.only(left: 48, bottom: 10, top: 10),
+          padding: const EdgeInsets.only(left: 48, bottom: 10, top: 10),
           child: FilledButton(
             child: Text('Start'),
             onPressed: started ? null : startRPC,
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(left: 10, bottom: 10, top: 10),
+          padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
           child: Button(
             child: Text('Stop'),
             onPressed: started ? stopRPC : null,
@@ -217,6 +137,119 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         )
       ]),
+      children: <Widget>[
+        InfoLabel(
+          label: 'Enter client ID:',
+          child: TextBox(
+            placeholder: 'Client ID',
+            expands: false,
+            onChanged: (str) {
+              clientID = str;
+            },
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Text',
+              style: FluentTheme.of(context).typography.subtitle,
+            ),
+            InfoLabel(
+              label: 'Top text:',
+              child: TextBox(
+                placeholder: 'Details',
+                expands: false,
+                onChanged: (str) {
+                  details = str;
+                },
+              ),
+            ),
+            InfoLabel(
+              label: 'Bottom text:',
+              child: TextBox(
+                placeholder: 'State',
+                expands: false,
+                onChanged: (str) {
+                  state = str;
+                },
+              ),
+            ),
+          ]
+          .map((w) => Padding(
+            padding: const EdgeInsets.only(top: 5, bottom: 5),
+            child: w,
+          )).toList(),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Timestamp',
+              style: FluentTheme.of(context).typography.subtitle,
+            ),
+            InfoLabel(
+              label: 'Start:',
+              child: TextBox(
+                placeholder: 'Start timestamp in ms',
+                expands: false,
+                onChanged: (str) {
+                  startTime = str;
+                },
+              ),
+            ),
+            InfoLabel(
+              label: 'End:',
+              child: TextBox(
+                placeholder: 'End timestamp in ms',
+                expands: false,
+                onChanged: (str) {
+                  endTime = str;
+                },
+              ),
+            ),
+          ]
+          .map((w) => Padding(
+            padding: const EdgeInsets.only(top: 5, bottom: 5),
+            child: w,
+          )).toList(),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text('Large image', style: FluentTheme.of(context).typography.subtitle),
+            InfoLabel(
+              label: 'Key:',
+              child: TextBox(
+                placeholder: 'Pretty self-explanatory',
+                expands: false,
+                onChanged: (str) {
+                  imageKey = str;
+                },
+              ),
+            ),
+            InfoLabel(
+              label: 'Text:',
+              child: TextBox(
+                placeholder: 'Text of large image when you hover over it',
+                expands: false,
+                onChanged: (str) {
+                  imageText = str;
+                },
+              ),
+            ),
+          ]
+          .map((w) => Padding(
+            padding: const EdgeInsets.only(top: 5, bottom: 5),
+            child: w,
+          )).toList(),
+        ),
+      ]
+      .map((w) => Padding(
+        padding:
+        const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+        child: w,
+      )).toList(),
     );
   }
 }
