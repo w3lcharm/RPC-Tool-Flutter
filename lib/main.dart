@@ -82,10 +82,14 @@ class _MyHomePageState extends State<MyHomePage> {
   String imageText = "";
   String smallImageKey = "";
   String smallImageText = "";
+  String partyID = "";
+  String partySize = "";
+  String partyMax = "";
 
   bool started = false;
 
   late DiscordRPC rpc;
+  FlyoutController controller = FlyoutController();
 
   void startRPC() {
     rpc = DiscordRPC(applicationId: clientID);
@@ -93,6 +97,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     int? start = int.tryParse(startTime);
     int? end = int.tryParse(endTime);
+
+    int? size = int.tryParse(partySize);
+    int? max = int.tryParse(partyMax);
 
     rpc.updatePresence(
       DiscordPresence(
@@ -102,8 +109,20 @@ class _MyHomePageState extends State<MyHomePage> {
         endTimeStamp: end,
         largeImageKey: imageKey,
         largeImageText: imageText,
+        smallImageKey: smallImageKey,
+        smallImageText: smallImageText,
+        partyId: partyID,
+        partySize: size,
+        partySizeMax: max,
       ),
     );
+
+    displayInfoBar(context, builder: (context, close) {
+      return const InfoBar(
+        title: Text('Started RPC!'),
+        severity: InfoBarSeverity.success,
+      );
+    });
 
     setState(() {
       started = !started;
@@ -113,6 +132,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void stopRPC() {
     rpc.clearPresence();
     rpc.shutDown();
+
+    displayInfoBar(context, builder: (context, close) {
+      return const InfoBar(
+        title: Text('Stopped RPC!'),
+        severity: InfoBarSeverity.success,
+      );
+    });
 
     setState(() {
       started = !started;
@@ -254,6 +280,80 @@ class _MyHomePageState extends State<MyHomePage> {
                       ))
                   .toList(),
             ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text('Small image',
+                    style: FluentTheme.of(context).typography.subtitle),
+                InfoLabel(
+                  label: 'Key:',
+                  child: TextBox(
+                    placeholder: 'Pretty self-explanatory',
+                    expands: false,
+                    onChanged: (str) {
+                      smallImageKey = str;
+                    },
+                  ),
+                ),
+                InfoLabel(
+                  label: 'Text:',
+                  child: TextBox(
+                    placeholder: 'Pretty self-explanatory too',
+                    expands: false,
+                    onChanged: (str) {
+                      smallImageText = str;
+                    },
+                  ),
+                ),
+              ]
+                  .map((w) => Padding(
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: w,
+                      ))
+                  .toList(),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text('Party',
+                    style: FluentTheme.of(context).typography.subtitle),
+                InfoLabel(
+                  label: 'Party ID:',
+                  child: TextBox(
+                    placeholder: 'Any value',
+                    expands: false,
+                    onChanged: (str) {
+                      partyID = str;
+                    },
+                  ),
+                ),
+                InfoLabel(
+                  label: 'Party size:',
+                  child: TextBox(
+                    placeholder: 'Optional',
+                    expands: false,
+                    onChanged: (str) {
+                      partySize = str;
+                    },
+                  ),
+                ),
+                InfoLabel(
+                  label: 'Party max:',
+                  child: TextBox(
+                    placeholder: 'Optional',
+                    expands: false,
+                    onChanged: (str) {
+                      partyMax = str;
+                    },
+                  ),
+                ),
+              ]
+                  .map((w) => Padding(
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: w,
+                      ))
+                  .toList(),
+            ),
           ]
               .map((w) => Padding(
                     padding: const EdgeInsets.symmetric(
@@ -269,7 +369,7 @@ class _MyHomePageState extends State<MyHomePage> {
             backgroundColor: ButtonState.all<Color>(Colors.transparent),
             border: ButtonState.all<BorderSide>(BorderSide.none),
           ),
-          child: Text('File'),
+          child: const Text('File'),
           onPressed: () {},
         ),
         Button(
@@ -277,10 +377,10 @@ class _MyHomePageState extends State<MyHomePage> {
             backgroundColor: ButtonState.all<Color>(Colors.transparent),
             border: ButtonState.all<BorderSide>(BorderSide.none),
           ),
-          child: Text('Help'),
+          child: const Text('Help'),
           onPressed: () {},
         )
-      ].map((w) => Padding(padding: EdgeInsets.only(right: 5), child: w)).toList()),
+      ].map((w) => Padding(padding: const EdgeInsets.only(right: 5), child: w)).toList()),
     ]);
   }
 }
