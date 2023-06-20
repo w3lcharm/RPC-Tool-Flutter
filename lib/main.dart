@@ -15,13 +15,26 @@ void main() async {
     await windowManager.setTitle(appTitle);
     await windowManager.setSize(const Size(700, 800));
     await windowManager.setMinimumSize(const Size(500, 500));
+    int build = int.tryParse(getWindowsBuild()) ?? 0;
+    if (Platform.isWindows && build < 22000) {
+      await windowManager.setBackgroundColor(SystemTheme.isDarkMode ? Colors.black : Colors.white);
+    }
     await windowManager.show();
     await windowManager.setSkipTaskbar(false);
   });
 
   await SystemTheme.accentColor.load();
+  WindowEffect effect = WindowEffect.disabled;
+  if (Platform.isWindows) {
+    int build = int.tryParse(getWindowsBuild()) ?? 0;
+    if (build >= 22000) {
+      effect = WindowEffect.mica;
+    } else {
+      effect = WindowEffect.disabled;
+    }
+  }
   await Window.setEffect(
-    effect: Platform.isWindows ? WindowEffect.mica : WindowEffect.disabled,
+    effect: effect,
     dark: SystemTheme.isDarkMode,
   );
 
@@ -30,10 +43,16 @@ void main() async {
   runApp(const MyApp());
 }
 
+String getWindowsBuild() {
+  String version = Platform.operatingSystemVersion;
+  RegExp exp = RegExp(r'([0-9]{5})');
+
+  return exp.firstMatch(version)![0] ?? "";
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return FluentApp(
@@ -48,7 +67,6 @@ class MyApp extends StatelessWidget {
         accentColor: SystemTheme.accentColor.accent.toAccentColor(),
         brightness: Brightness.dark,
       ),
-      themeMode: ThemeMode.system,
       home: MyHomePage(title: 'RPC-Tool'),
     );
   }
@@ -56,15 +74,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -354,6 +363,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ))
                   .toList(),
             ),
+            Text('Windows version: ${Platform.operatingSystemVersion}')
           ]
               .map((w) => Padding(
                     padding: const EdgeInsets.symmetric(

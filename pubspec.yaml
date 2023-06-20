@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   fluent_ui: ^4.4.0
-  dart_discord_rpc: ^0.0.1
+  dart_discord_rpc: ^0.0.2
   system_theme: ^2.2.0
   flutter_acrylic: ^1.1.0
 
